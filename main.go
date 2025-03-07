@@ -17,7 +17,7 @@ func main() {
     if err != nil {
         log.Fatalf("Error: Invalid day [%s]: %s", args[1], err)
     }
-    solutions := []func(){days.Day1.Solve, days.Day2.Solve}
+    solutions := []func(){days.Day1.Solve, days.Day2.Solve, days.Day3.Solve}
     if day-1 >= len(solutions) {
         log.Fatalf("No implementation for %d", day)
     }
