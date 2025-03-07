@@ -7,6 +7,8 @@ import (
     "github.com/reshane/aocgo24/days"
 )
 
+var solutions = []days.Solver{days.Day1, days.Day2, days.Day3}
+
 func main() {
     args := os.Args
     if len(args) < 2 {
@@ -17,9 +19,9 @@ func main() {
     if err != nil {
         log.Fatalf("Error: Invalid day [%s]: %s", args[1], err)
     }
-    solutions := []func(){days.Day1.Solve, days.Day2.Solve, days.Day3.Solve}
-    if day-1 >= len(solutions) {
+
+    if day-1 >= len(solutions) || day-1 < 0 {
         log.Fatalf("No implementation for %d", day)
     }
-    solutions[day-1]()
+    solutions[day-1].Solve()
 }
