@@ -55,3 +55,13 @@ func Test_Difference(t *testing.T) {
         t.Errorf("Intersection should contain [%d] elements", 4)
     }
 }
+
+func Test_Clone(t *testing.T) {
+    a := NewSetFrom([]int{ 0 })
+    b := a.Clone()
+
+    b.Pop(0)
+    if !a.Contains(0) {
+        t.Errorf("Cloned set should contain [%d]", 0)
+    }
+}

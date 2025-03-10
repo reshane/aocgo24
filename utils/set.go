@@ -17,7 +17,11 @@ func NewSetFrom[T comparable](collection []T) Set[T] {
 }
 
 func (s *Set[T]) Clone() Set[T] {
-    return Set[T]{ s.data }
+    newData := make(map[T]struct{}, len(s.data))
+    for k, _ := range s.data {
+        newData[k] = struct{}{}
+    }
+    return Set[T]{ newData }
 }
 
 func (s *Set[T]) Push(e T) {
