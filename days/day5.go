@@ -61,22 +61,19 @@ func parseInput(contents string) (map[int][]int, [][]int) {
 }
 
 func checkTopo(topo map[int][]int, order []int) bool {
-    set := make(map[int]struct{})
-    orderingSet := make(map[int]struct{})
-    for _, o := range order {
-        orderingSet[o] = struct{}{}
-    }
+    set := utils.NewSet[int]()
+    orderingSet := utils.NewSetFrom[int](order)
     for i := 0; i < len(order); i++ {
         curr := order[i]
         deps := topo[curr]
         for _, dep := range deps {
-            if _, e := orderingSet[dep]; e {
-                set[dep] = struct{}{}
+            if orderingSet.Contains(dep) {
+                set.Push(dep)
             }
         }
-        delete(set, curr)
+        set.Pop(curr)
     }
-    return len(set) == 0
+    return set.Size() == 0
 }
 
 func (day5) Part1(contents string) int {
