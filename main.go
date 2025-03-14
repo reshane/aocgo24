@@ -7,7 +7,7 @@ import (
     "github.com/reshane/aocgo24/days"
 )
 
-var solutions = []days.Solver{ days.Day1, days.Day2, days.Day3, days.Day4, days.Day5 }
+var solutions = []days.Solver{ days.Day1, days.Day2, days.Day3, days.Day4, days.Day5, days.Day6 }
 
 func main() {
     args := os.Args
