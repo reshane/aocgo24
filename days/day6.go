@@ -87,66 +87,67 @@ type Vel struct {
 }
 
 func (day6) Part2(contents string) int {
-    guard, walls := Day6.parseInput(contents)
-    visited := utils.NewSet[Vel]()
-    path := make([]Vel, 0)
     dirs := []Pos{ {0, -1}, {1, 0}, {0, 1}, {-1, 0} }
-    dirIdx := 0
-    curr := guard
+    guard, walls := Day6.parseInput(contents)
+    curr := Vel{ guard, 0 }
+    visited := utils.NewSetFrom([]Vel{ curr })
+    cycleObs := utils.NewSet[Pos]()
     for {
-        path = append(path, Vel{curr, dirIdx})
-        visited.Push(Vel{curr, dirIdx})
-
-        wall, exists := walls[curr.plus(dirs[dirIdx])]
+        // add an obstacle at the next position
+        // run until exit or cycle
+        // if cycle, add the next position to the set
+        visited.Push(curr)
+        
+        // place a wall at the next position
+        wall, exists := walls[curr.pos.plus(dirs[curr.dir])]
         if !exists {
             break
         }
         if wall == 1 {
-            dirIdx += 1
-            dirIdx %= 4
+            // turn and continue
+            curr.dir += 1
+            curr.dir %= 4
         } else {
-            curr.add(dirs[dirIdx])
-        }
-    }
-    // for every position in path
-    // place obstacle
-    // step until either pos and dir is in visited
-    // or pos does not exists
-    checked := utils.NewSet[Pos]()
-    cycles := utils.NewSet[Pos]()
-    checked.Push(guard)
-    for i := 0; i < len(path)-1; i++ {
-        if checked.Contains(path[i+1].pos) {
-            // if the obstacle position is in the path before the curr pos,
-            // then the curr pos might be unreachable from here
-            // and we have also already checked it
-            continue
-        }
-        curr = guard
-        dirIdx = 0
-        walls[path[i+1].pos] = 1
-        cycleVisited := utils.NewSet[Vel]()
-        // check if this causes a cycle
-        for {
-            cycleVisited.Push(Vel{ curr, dirIdx })
-            wall, exists := walls[curr.plus(dirs[dirIdx])]
-            if !exists {
-                break
+            pn := curr.pos.plus(dirs[curr.dir])
+            if visited.Contains(Vel{pn,0}) || visited.Contains(Vel{pn,1}) || visited.Contains(Vel{pn,2}) || visited.Contains(Vel{pn,3}) {
+                curr.pos.add(dirs[curr.dir])
+                continue
             }
-            if wall == 1 {
-                dirIdx += 1
-                dirIdx %= 4
-            } else {
-                curr.add(dirs[dirIdx])
+            // place obstacle at curr.pos.plus(dirs[curr.dir])]
+            walls[curr.pos.plus(dirs[curr.dir])] = 1
+            // step until something either isn't in walls or is in cycleVisited
+            cycleVisited := visited.Clone()
+            cycleCurr := curr
+            for {
+                cycleVisited.Push(cycleCurr)
+                next := Vel{cycleCurr.pos.plus(dirs[cycleCurr.dir]), cycleCurr.dir}
+
+                wall, exists := walls[next.pos]
+                if !exists {
+                    // no cycle here
+                    break
+                }
+                if wall == 1 {
+                    // turn 
+                    cycleCurr.dir += 1
+                    cycleCurr.dir %= 4
+                } else {
+                    // if next is in visited, cycle
+                    if cycleVisited.Contains(next) {
+                        cycleObs.Push(curr.pos.plus(dirs[curr.dir]))
+                        break
+                    }
+                    // else, curr = next
+                    cycleCurr.pos.add(dirs[cycleCurr.dir])
+                }
             }
 
-            if cycleVisited.Contains(Vel{ curr, dirIdx }) {
-                // cycle!!
-                cycles.Push(path[i+1].pos)
-                break
-            }
+            // unset the wall for other iterations
+            walls[curr.pos.plus(dirs[curr.dir])] = 0
+            // update current position
+            curr.pos.add(dirs[curr.dir])
         }
-        walls[path[i+1].pos] = 0
     }
-    return cycles.Size()
+    return cycleObs.Size()
 }
+
