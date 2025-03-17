@@ -21,20 +21,6 @@ func (day6) Solve() {
     log.Printf("Part 2: %d\n", Day6.Part2(contents))
 }
 
-type Pos struct {
-    x int
-    y int
-}
-
-func (a *Pos) add(other Pos) {
-    a.x += other.x
-    a.y += other.y
-}
-
-func (a *Pos) plus(other Pos) Pos {
-    return Pos { a.x + other.x, a.y + other.y }
-}
-
 func (day6) parseInput(contents string) (Pos, map[Pos]int) {
     guard := Pos{ -1, -1 }
     walls := make(map[Pos]int)
@@ -81,7 +67,7 @@ func (day6) Part1(contents string) int {
     return visited.Size()
 }
 
-type Vel struct {
+type vel struct {
     pos Pos
     dir int
 }
@@ -89,8 +75,8 @@ type Vel struct {
 func (day6) Part2(contents string) int {
     dirs := []Pos{ {0, -1}, {1, 0}, {0, 1}, {-1, 0} }
     guard, walls := Day6.parseInput(contents)
-    curr := Vel{ guard, 0 }
-    visited := utils.NewSetFrom([]Vel{ curr })
+    curr := vel{ guard, 0 }
+    visited := utils.NewSetFrom([]vel{ curr })
     cycleObs := utils.NewSet[Pos]()
     for {
         // add an obstacle at the next position
@@ -109,7 +95,7 @@ func (day6) Part2(contents string) int {
             curr.dir %= 4
         } else {
             pn := curr.pos.plus(dirs[curr.dir])
-            if visited.Contains(Vel{pn,0}) || visited.Contains(Vel{pn,1}) || visited.Contains(Vel{pn,2}) || visited.Contains(Vel{pn,3}) {
+            if visited.Contains(vel{pn,0}) || visited.Contains(vel{pn,1}) || visited.Contains(vel{pn,2}) || visited.Contains(vel{pn,3}) {
                 curr.pos.add(dirs[curr.dir])
                 continue
             }
@@ -120,7 +106,7 @@ func (day6) Part2(contents string) int {
             cycleCurr := curr
             for {
                 cycleVisited.Push(cycleCurr)
-                next := Vel{cycleCurr.pos.plus(dirs[cycleCurr.dir]), cycleCurr.dir}
+                next := vel{cycleCurr.pos.plus(dirs[cycleCurr.dir]), cycleCurr.dir}
 
                 wall, exists := walls[next.pos]
                 if !exists {
