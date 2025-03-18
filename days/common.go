@@ -14,6 +14,7 @@ var Solutions = []Solver{
     Day7,
     Day8,
     Day9,
+    Day10,
 }
 
 type Pos struct {
